@@ -115,6 +115,24 @@ export class MaterielStorage {
     return equipement;
   }
 
+  updateEquipement(equipementId: number, data: Omit<Equipement, 'id'>): boolean {
+    const equipementExists = this.equipements().some(
+      (equipement) => equipement.id === equipementId,
+    );
+    if (!equipementExists) {
+      return false;
+    }
+
+    this.equipements.update((equipements) =>
+      equipements.map((equipement) =>
+        equipement.id === equipementId
+          ? { ...data, id: equipementId }
+          : equipement,
+      ),
+    );
+    return true;
+  }
+
   removeEquipement(equipementId: number): boolean {
     const equipementExists = this.equipements().some(
       (equipement) => equipement.id === equipementId,
