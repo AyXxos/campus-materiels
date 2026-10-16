@@ -69,16 +69,6 @@ import { AuthService } from '../services/auth.service';
             <mat-icon aria-hidden="true">arrow_forward</mat-icon>
           </button>
         </form>
-
-        <div class="demo-info">
-          <mat-icon aria-hidden="true">info</mat-icon>
-          <div>
-            <strong>Comptes de démonstration</strong>
-            <span>Alice : user@example.com / user</span>
-            <span>Yanis : yanis@example.com / yanis</span>
-            <span>Responsable : admin@example.com / admin</span>
-          </div>
-        </div>
       </section>
     </main>
   `,
