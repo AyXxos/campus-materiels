@@ -42,7 +42,13 @@ import { AdminEquipmentDialog } from './admin-equipment-dialog';
             <p class="section-kicker">Inventaire</p>
             <h2>Matériel</h2>
           </div>
-          <span class="section-count">{{ storage.equipementsReadonly().length }} équipements</span>
+          <div class="section-heading-actions">
+            <span class="section-count">{{ storage.equipementsReadonly().length }} équipements</span>
+            <button mat-flat-button type="button" (click)="addEquipment()">
+              <mat-icon aria-hidden="true">add</mat-icon>
+              Ajouter
+            </button>
+          </div>
         </div>
 
         <div class="equipment-grid">
@@ -142,6 +148,7 @@ export class Admin {
       this.showFeedback('Équipement introuvable.', true);
       return;
     }
+
     this.clearFeedback();
     const dialogRef = this.dialog.open(AdminEquipmentDialog, {
       data: equipment,
@@ -160,7 +167,28 @@ export class Admin {
     });
   }
 
+  protected addEquipment(): void {
+    this.clearFeedback();
+    const dialogRef = this.dialog.open(AdminEquipmentDialog, {
+      data: null,
+      width: '680px',
+      maxWidth: 'calc(100vw - 2rem)',
+    });
+    dialogRef.afterClosed().subscribe((data: Omit<Equipement, 'id'> | undefined) => {
+      if (!data) {
+        return;
+      }
+      this.storage.addEquipement(data);
+      this.showFeedback('Équipement ajouté avec succès.', false);
+    });
+  }
+
   protected deleteEquipment(equipmentId: number): void {
+    const equipment = this.storage.getEquipementById(equipmentId);
+    if (!equipment || !window.confirm(`Supprimer « ${equipment.nom} » du catalogue ?`)) {
+      return;
+    }
+
     if (this.storage.removeEquipement(equipmentId)) {
       this.showFeedback('Équipement supprimé avec succès.', false);
     } else {
@@ -169,6 +197,14 @@ export class Admin {
   }
 
   protected cancelReservation(reservationId: string): void {
+    const reservation = this.reservations().find((item) => item.id === reservationId);
+    if (
+      !reservation ||
+      !window.confirm(`Retirer la réservation de « ${reservation.equipement.nom} » ?`)
+    ) {
+      return;
+    }
+
     if (this.storage.removeReservation(reservationId)) {
       this.showFeedback('Réservation retirée avec succès.', false);
     } else {

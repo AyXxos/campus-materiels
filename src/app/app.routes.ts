@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { AccessDenied } from './vues/access-denied';
-import { Admin } from './vues/admin';
 import { Account } from './vues/account';
 import { Catalog } from './vues/catalog';
 import { EquipmentDetail } from './vues/equipment-detail';
@@ -28,7 +27,11 @@ export const routes: Routes = [
     ],
   },
   { path: 'reservations', pathMatch: 'full', redirectTo: 'compte/reservations' },
-  { path: 'admin', component: Admin, canActivate: [adminGuard] },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () => import('./vues/admin').then((module) => module.Admin),
+  },
   { path: 'connexion', component: Login },
   { path: 'acces-refuse', component: AccessDenied },
   { path: 'erreur-session', component: SessionError },

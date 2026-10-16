@@ -9,6 +9,12 @@ import {
   RESERVATIONS_INITIALES,
 } from '../data/donnees-initiales';
 
+export type StorageError =
+  | 'read'
+  | 'write'
+  | 'invalid'
+  | 'unavailable';
+
 @Injectable({ providedIn: 'root' })
 export class MaterielStorage {
   private readonly comptes = signal<Compte[]>([]);
@@ -19,6 +25,7 @@ export class MaterielStorage {
   readonly comptesReadonly = this.comptes.asReadonly();
   readonly equipementsReadonly = this.equipements.asReadonly();
   readonly reservationsReadonly = this.reservations.asReadonly();
+  readonly storageError = signal<StorageError | null>(null);
   readonly equipementsDisponibles = computed(() =>
     this.equipements().filter((equipement) => this.isEquipementDisponible(equipement.id)),
   );
@@ -43,6 +50,7 @@ export class MaterielStorage {
         localStorage.setItem(this.storageKeys.equipements, JSON.stringify(this.equipements()));
         localStorage.setItem(this.storageKeys.reservations, JSON.stringify(this.reservations()));
       } catch {
+        this.storageError.set('write');
         console.warn('Sauvegarde locale du matériel impossible');
       }
     });
@@ -181,18 +189,33 @@ export class MaterielStorage {
         }
       }
     } catch {
+      this.storageError.set('unavailable');
       console.warn('Initialisation locale du matériel impossible');
     }
   }
 
   private loadOrInitialize<T>(key: string, initialData: T[]): T[] {
-    const storedData = localStorage.getItem(key);
+    let storedData: string | null;
+    try {
+      storedData = localStorage.getItem(key);
+    } catch {
+      if (this.storageError() === null) {
+        this.storageError.set('read');
+      }
+      return this.clone(initialData);
+    }
+
     if (storedData === null) {
       return this.clone(initialData);
     }
     try {
-      return JSON.parse(storedData) as T[];
+      const parsedData: unknown = JSON.parse(storedData);
+      if (!Array.isArray(parsedData)) {
+        throw new Error('Les données locales ne sont pas une collection.');
+      }
+      return parsedData as T[];
     } catch {
+      this.storageError.set('invalid');
       console.warn(`Données locales invalides pour la clé ${key}`);
       return this.clone(initialData);
     }

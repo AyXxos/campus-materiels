@@ -83,6 +83,12 @@ h3 {
   font-weight: 700;
 }
 
+.section-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .equipment-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -252,6 +258,11 @@ h3 {
 
   .admin-header,
   .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .section-heading-actions {
     align-items: stretch;
     flex-direction: column;
   }

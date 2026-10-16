@@ -86,6 +86,14 @@ export class MyReservations {
   });
 
   protected cancel(reservationId: string): void {
+    const reservation = this.reservations().find((item) => item.id === reservationId);
+    if (
+      !reservation ||
+      !window.confirm(`Annuler la réservation de « ${reservation.equipement.nom} » ?`)
+    ) {
+      return;
+    }
+
     this.storage.removeReservation(reservationId);
   }
 }

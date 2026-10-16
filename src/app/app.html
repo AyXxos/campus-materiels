@@ -1,4 +1,23 @@
 <app-navbar></app-navbar>
+@if (storageError(); as storageError) {
+  <aside class="storage-alert" role="alert">
+    <mat-icon aria-hidden="true">warning</mat-icon>
+    @switch (storageError) {
+      @case ('read') {
+        <span>Impossible de lire les données locales. Les données de démonstration sont affichées.</span>
+      }
+      @case ('write') {
+        <span>Impossible d'enregistrer vos modifications dans le stockage local.</span>
+      }
+      @case ('invalid') {
+        <span>Les données locales sont invalides. Les données de démonstration sont affichées.</span>
+      }
+      @case ('unavailable') {
+        <span>Le stockage local est indisponible. Vos modifications ne seront pas conservées.</span>
+      }
+    }
+  </aside>
+}
 <main>
   <router-outlet></router-outlet>
 </main>
