@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.navbar {
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: inherit;
+  font-size: 1.1rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand mat-icon {
+  color: white;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 2rem;
+}
+
+.nav-links a.active,
+.navbar a.active {
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user-name {
+  margin-right: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.navbar button mat-icon,
+.navbar a mat-icon {
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    min-height: 64px;
+    height: auto;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+  }
+
+  .brand {
+    flex: 1;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    margin: 0;
+  }
+
+  .nav-links a {
+    flex: 1;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .navbar button,
+  .navbar > a[mat-flat-button] {
+    min-width: 0;
+  }
+
+  .navbar button mat-icon,
+  .navbar > a[mat-flat-button] mat-icon {
+    margin-right: 0;
+  }
+
+  .navbar button mat-icon + *,
+  .navbar > a[mat-flat-button] mat-icon + * {
+    display: none;
+  }
+}
