@@ -1,0 +1,62 @@
+.settings-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--mat-sys-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+  font-size: 2rem;
+}
+
+header > p:last-child {
+  margin: 0.6rem 0 1.75rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.85rem;
+  padding: 1.1rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.9rem;
+  box-shadow: none;
+}
+
+.profile-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.7rem;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.profile-card div:last-child {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.label {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 650px) {
+  .settings-page {
+    padding: 1.5rem;
+  }
+}

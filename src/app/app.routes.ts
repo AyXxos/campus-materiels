@@ -6,7 +6,6 @@ import { Catalog } from './vues/catalog';
 import { EquipmentDetail } from './vues/equipment-detail';
 import { Home } from './vues/home';
 import { Login } from './vues/login';
-import { MyEquipment } from './vues/my-equipment';
 import { MyReservations } from './vues/my-reservations';
 import { NotFound } from './vues/not-found';
 import { Settings } from './vues/settings';
@@ -23,8 +22,7 @@ export const routes: Routes = [
     component: Account,
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'materiel' },
-      { path: 'materiel', component: MyEquipment },
+      { path: '', pathMatch: 'full', redirectTo: 'reservations' },
       { path: 'reservations', component: MyReservations },
       { path: 'settings', component: Settings },
     ],
