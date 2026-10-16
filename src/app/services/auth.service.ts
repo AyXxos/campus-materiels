@@ -42,6 +42,10 @@ export class AuthService {
         password: 'user',
         user: { id: 1, name: 'Alice Martin', role: 'student' },
       },
+      'yanis@example.com': {
+        password: 'yanis',
+        user: { id: 2, name: 'Yanis Bernard', role: 'student' },
+      },
     };
     const account = accounts[email.trim().toLowerCase()];
     if (!account || account.password !== password) {

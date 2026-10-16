@@ -73,8 +73,10 @@ import { AuthService } from '../services/auth.service';
         <div class="demo-info">
           <mat-icon aria-hidden="true">info</mat-icon>
           <div>
-            <strong>Compte de démonstration</strong>
-            <span>user@example.com / user</span>
+            <strong>Comptes de démonstration</strong>
+            <span>Alice : user@example.com / user</span>
+            <span>Yanis : yanis@example.com / yanis</span>
+            <span>Responsable : admin@example.com / admin</span>
           </div>
         </div>
       </section>

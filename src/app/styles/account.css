@@ -3,7 +3,6 @@
   min-height: calc(100vh - 4rem);
   margin: 0 auto;
   padding: 2.5rem 2rem 5rem;
-  background: var(--mat-sys-surface);
 }
 
 .account-hero {
