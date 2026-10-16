@@ -1,13 +1,105 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { CATEGORIES } from '../data/donnees-initiales';
+import { MaterielStorage } from '../services/materiel-storage';
 
 @Component({
   selector: 'app-catalog',
-  imports: [RouterLink],
+  imports: [
+    MatButtonModule,
+    MatCardModule,
+    MatIconModule,
+    RouterLink,
+  ],
+  styleUrl: '../styles/catalog.css',
   template: `
-    <h1>Catalogue du materiel</h1>
-    <p>Consultez le materiel disponible et ses details.</p>
-    <a routerLink="/materiel/1">Voir un exemple de materiel</a>
+    <div class="catalog-page">
+      <header class="catalog-header">
+        <div>
+          <p class="eyebrow">Campus matériel</p>
+          <h1>Le matériel dont vous avez besoin</h1>
+          <p class="intro">
+            Parcourez le catalogue et trouvez rapidement l'équipement disponible sur le campus.
+          </p>
+        </div>
+        <div class="availability">
+          <mat-icon aria-hidden="true">inventory_2</mat-icon>
+          <span>
+            <strong>{{ storage.equipementsDisponibles().length }}</strong>
+            équipement{{ storage.equipementsDisponibles().length > 1 ? 's' : '' }} disponible{{ storage.equipementsDisponibles().length > 1 ? 's' : '' }}
+          </span>
+        </div>
+      </header>
+
+      <section class="catalog-toolbar" aria-label="Filtres du catalogue">
+        <div class="toolbar-title">
+          <mat-icon aria-hidden="true">tune</mat-icon>
+          <span>Filtrer le catalogue</span>
+        </div>
+        <label class="category-filter">
+          <span>Catégorie</span>
+          <select [value]="selectedCategory()" (change)="selectedCategory.set($any($event.target).value)">
+            <option value="all">Toutes les catégories</option>
+            @for (category of categories; track category) {
+              <option [value]="category">{{ category }}</option>
+            }
+          </select>
+        </label>
+      </section>
+
+      <section class="equipment-list" aria-label="Matériel disponible">
+        @for (equipement of filteredEquipements(); track equipement.id) {
+          <mat-card class="equipment-card">
+            <div class="card-accent" aria-hidden="true"></div>
+            <mat-card-header>
+              <div mat-card-avatar class="equipment-icon">
+                <mat-icon aria-hidden="true">devices</mat-icon>
+              </div>
+              <mat-card-title>{{ equipement.nom }}</mat-card-title>
+              <mat-card-subtitle>{{ equipement.categorie }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="description">{{ equipement.description }}</p>
+              <div class="equipment-meta">
+                <div class="location">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>{{ equipement.localisation }}</span>
+                </div>
+                <span class="status">
+                  <span class="status-dot" aria-hidden="true"></span>
+                  Disponible
+                </span>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <a mat-flat-button [routerLink]="['/materiel', equipement.id]">
+                Voir le détail
+                <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+              </a>
+            </mat-card-actions>
+          </mat-card>
+        } @empty {
+          <div class="empty-state">
+            <mat-icon aria-hidden="true">search_off</mat-icon>
+            <h2>Aucun équipement trouvé</h2>
+            <p>Essayez une autre catégorie.</p>
+          </div>
+        }
+      </section>
+    </div>
   `,
 })
-export class Catalog {}
+export class Catalog {
+  protected readonly storage = inject(MaterielStorage);
+  protected readonly categories = CATEGORIES;
+  protected readonly selectedCategory = signal('all');
+  protected readonly filteredEquipements = computed(() => {
+    const category = this.selectedCategory();
+    return this.storage.equipementsDisponibles().filter(
+      (equipement) => category === 'all' || equipement.categorie === category,
+    );
+  });
+}
