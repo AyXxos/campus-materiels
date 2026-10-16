@@ -1,18 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CATEGORIES } from '../data/donnees-initiales';
 import { MaterielStorage } from '../services/materiel-storage';
+import { EquipmentCard } from './components/equipment-card';
 
 @Component({
   selector: 'app-catalog',
   imports: [
-    MatButtonModule,
-    MatCardModule,
     MatIconModule,
-    RouterLink,
+    EquipmentCard,
   ],
   styleUrl: '../styles/catalog.css',
   template: `
@@ -71,35 +68,11 @@ import { MaterielStorage } from '../services/materiel-storage';
 
       <section class="equipment-list" aria-label="Catalogue du matériel">
         @for (equipement of filteredEquipements(); track equipement.id) {
-          <mat-card class="equipment-card">
-            <div class="card-accent" aria-hidden="true"></div>
-            <mat-card-header>
-              <div mat-card-avatar class="equipment-icon">
-                <mat-icon aria-hidden="true">devices</mat-icon>
-              </div>
-              <mat-card-title>{{ equipement.nom }}</mat-card-title>
-              <mat-card-subtitle>{{ equipement.categorie }}</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <p class="description">{{ equipement.description }}</p>
-              <div class="equipment-meta">
-                <div class="location">
-                  <mat-icon aria-hidden="true">location_on</mat-icon>
-                  <span>{{ equipement.localisation }}</span>
-                </div>
-                <span class="status" [class.unavailable]="!storage.isEquipementDisponible(equipement.id)">
-                  <span class="status-dot" aria-hidden="true"></span>
-                  {{ storage.isEquipementDisponible(equipement.id) ? 'Disponible' : 'Indisponible' }}
-                </span>
-              </div>
-            </mat-card-content>
-            <mat-card-actions>
-              <a mat-flat-button [routerLink]="['/materiel', equipement.id]">
-                Voir le détail
-                <mat-icon aria-hidden="true">arrow_forward</mat-icon>
-              </a>
-            </mat-card-actions>
-          </mat-card>
+          <app-equipment-card
+            [equipment]="equipement"
+            [available]="storage.isEquipementDisponible(equipement.id)"
+            (detailsRequested)="showDetails($event)"
+          />
         } @empty {
           <div class="empty-state">
             @if (storage.getEquipements()().length === 0) {
@@ -119,10 +92,16 @@ import { MaterielStorage } from '../services/materiel-storage';
 })
 export class Catalog {
   protected readonly storage = inject(MaterielStorage);
+  private readonly router = inject(Router);
   protected readonly categories = CATEGORIES;
   protected readonly selectedCategory = signal('all');
   protected readonly selectedAvailability = signal('all');
   protected readonly searchTerm = signal('');
+
+  protected showDetails(equipmentId: number): void {
+    this.router.navigate(['/materiel', equipmentId]);
+  }
+
   protected readonly filteredEquipements = computed(() => {
     const category = this.selectedCategory();
     const availability = this.selectedAvailability();
