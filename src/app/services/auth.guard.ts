@@ -5,6 +5,9 @@ import { AuthService } from './auth.service';
 export const authGuard: CanActivateFn = async (_, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  if (!auth.isBrowser) {
+    return true;
+  }
   await auth.ensureSession();
   if (auth.status() === 'error') {
     return router.parseUrl('/erreur-session');

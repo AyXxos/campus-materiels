@@ -39,6 +39,17 @@ import { MaterielStorage } from '../services/materiel-storage';
           <mat-icon aria-hidden="true">tune</mat-icon>
           <span>Filtrer le catalogue</span>
         </div>
+        <label class="name-filter">
+          <mat-icon aria-hidden="true">search</mat-icon>
+          <span class="visually-hidden">Rechercher par nom</span>
+          <input
+            #searchInput
+            type="search"
+            placeholder="Rechercher par nom"
+            [value]="searchTerm()"
+            (input)="searchTerm.set(searchInput.value)"
+          />
+        </label>
         <label class="category-filter">
           <span>Catégorie</span>
           <select [value]="selectedCategory()" (change)="selectedCategory.set($any($event.target).value)">
@@ -83,9 +94,15 @@ import { MaterielStorage } from '../services/materiel-storage';
           </mat-card>
         } @empty {
           <div class="empty-state">
-            <mat-icon aria-hidden="true">search_off</mat-icon>
-            <h2>Aucun équipement trouvé</h2>
-            <p>Essayez une autre catégorie.</p>
+            @if (storage.equipementsDisponibles().length === 0) {
+              <mat-icon aria-hidden="true">inventory_2</mat-icon>
+              <h2>Aucun équipement disponible</h2>
+              <p>Il n'y a actuellement aucun équipement disponible.</p>
+            } @else {
+              <mat-icon aria-hidden="true">search_off</mat-icon>
+              <h2>Aucun équipement ne correspond à votre recherche</h2>
+              <p>Modifiez le nom recherché ou choisissez une autre catégorie.</p>
+            }
           </div>
         }
       </section>
@@ -96,10 +113,14 @@ export class Catalog {
   protected readonly storage = inject(MaterielStorage);
   protected readonly categories = CATEGORIES;
   protected readonly selectedCategory = signal('all');
+  protected readonly searchTerm = signal('');
   protected readonly filteredEquipements = computed(() => {
     const category = this.selectedCategory();
+    const searchTerm = this.searchTerm().trim().toLocaleLowerCase();
     return this.storage.equipementsDisponibles().filter(
-      (equipement) => category === 'all' || equipement.categorie === category,
+      (equipement) =>
+        (category === 'all' || equipement.categorie === category) &&
+        equipement.nom.toLocaleLowerCase().includes(searchTerm),
     );
   });
 }

@@ -10,31 +10,26 @@ export class AuthService {
   readonly user = signal<User | null>(null);
   readonly status = signal<AuthStatus>('loading');
   readonly isAdmin = computed(() => this.user()?.role === 'admin');
+  readonly isBrowser: boolean;
 
   private readonly storageKey = 'campus-materiel-auth-user';
-  private readonly browser: boolean;
 
   constructor(@Inject(PLATFORM_ID) platformId: object) {
-    this.browser = isPlatformBrowser(platformId);
+    this.isBrowser = isPlatformBrowser(platformId);
+    if (this.isBrowser) {
+      this.restoreSession();
+    }
   }
 
   async ensureSession(): Promise<void> {
     if (this.status() !== 'loading') {
       return;
     }
-    if (!this.browser) {
+    if (!this.isBrowser) {
       this.status.set('loaded');
       return;
     }
-    try {
-      const storedUser = window.localStorage.getItem(this.storageKey);
-      if (storedUser) {
-        this.user.set(JSON.parse(storedUser) as User);
-      }
-      this.status.set('loaded');
-    } catch {
-      this.status.set('error');
-    }
+    this.restoreSession();
   }
 
   login(email: string, password: string): boolean {
@@ -54,7 +49,7 @@ export class AuthService {
     }
     this.user.set(account.user);
     this.status.set('loaded');
-    if (this.browser) {
+    if (this.isBrowser) {
       window.localStorage.setItem(this.storageKey, JSON.stringify(account.user));
     }
     return true;
@@ -62,8 +57,20 @@ export class AuthService {
 
   logout(): void {
     this.user.set(null);
-    if (this.browser) {
+    if (this.isBrowser) {
       window.localStorage.removeItem(this.storageKey);
+    }
+  }
+
+  private restoreSession(): void {
+    try {
+      const storedUser = window.localStorage.getItem(this.storageKey);
+      if (storedUser) {
+        this.user.set(JSON.parse(storedUser) as User);
+      }
+      this.status.set('loaded');
+    } catch {
+      this.status.set('error');
     }
   }
 }
