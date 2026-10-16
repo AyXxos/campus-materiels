@@ -29,7 +29,7 @@ import { MaterielStorage } from '../services/materiel-storage';
           <mat-icon aria-hidden="true">inventory_2</mat-icon>
           <span>
             <strong>{{ storage.equipementsDisponibles().length }}</strong>
-            équipement{{ storage.equipementsDisponibles().length > 1 ? 's' : '' }} disponible{{ storage.equipementsDisponibles().length > 1 ? 's' : '' }}
+            sur {{ storage.getEquipements()().length }} équipements disponibles
           </span>
         </div>
       </header>
@@ -59,9 +59,17 @@ import { MaterielStorage } from '../services/materiel-storage';
             }
           </select>
         </label>
+        <label class="category-filter">
+          <span>Disponibilité</span>
+          <select [value]="selectedAvailability()" (change)="selectedAvailability.set($any($event.target).value)">
+            <option value="all">Tous les équipements</option>
+            <option value="available">Disponibles</option>
+            <option value="unavailable">Indisponibles</option>
+          </select>
+        </label>
       </section>
 
-      <section class="equipment-list" aria-label="Matériel disponible">
+      <section class="equipment-list" aria-label="Catalogue du matériel">
         @for (equipement of filteredEquipements(); track equipement.id) {
           <mat-card class="equipment-card">
             <div class="card-accent" aria-hidden="true"></div>
@@ -79,9 +87,9 @@ import { MaterielStorage } from '../services/materiel-storage';
                   <mat-icon aria-hidden="true">location_on</mat-icon>
                   <span>{{ equipement.localisation }}</span>
                 </div>
-                <span class="status">
+                <span class="status" [class.unavailable]="!storage.isEquipementDisponible(equipement.id)">
                   <span class="status-dot" aria-hidden="true"></span>
-                  Disponible
+                  {{ storage.isEquipementDisponible(equipement.id) ? 'Disponible' : 'Indisponible' }}
                 </span>
               </div>
             </mat-card-content>
@@ -94,14 +102,14 @@ import { MaterielStorage } from '../services/materiel-storage';
           </mat-card>
         } @empty {
           <div class="empty-state">
-            @if (storage.equipementsDisponibles().length === 0) {
+            @if (storage.getEquipements()().length === 0) {
               <mat-icon aria-hidden="true">inventory_2</mat-icon>
-              <h2>Aucun équipement disponible</h2>
-              <p>Il n'y a actuellement aucun équipement disponible.</p>
+              <h2>Aucun équipement dans le catalogue</h2>
+              <p>Il n'y a actuellement aucun matériel enregistré.</p>
             } @else {
               <mat-icon aria-hidden="true">search_off</mat-icon>
-              <h2>Aucun équipement ne correspond à votre recherche</h2>
-              <p>Modifiez le nom recherché ou choisissez une autre catégorie.</p>
+              <h2>Aucun équipement ne correspond aux critères</h2>
+              <p>Modifiez le nom, la catégorie ou la disponibilité sélectionnée.</p>
             }
           </div>
         }
@@ -113,13 +121,18 @@ export class Catalog {
   protected readonly storage = inject(MaterielStorage);
   protected readonly categories = CATEGORIES;
   protected readonly selectedCategory = signal('all');
+  protected readonly selectedAvailability = signal('all');
   protected readonly searchTerm = signal('');
   protected readonly filteredEquipements = computed(() => {
     const category = this.selectedCategory();
+    const availability = this.selectedAvailability();
     const searchTerm = this.searchTerm().trim().toLocaleLowerCase();
-    return this.storage.equipementsDisponibles().filter(
+    return this.storage.getEquipements()().filter(
       (equipement) =>
         (category === 'all' || equipement.categorie === category) &&
+        (availability === 'all' ||
+          (availability === 'available' && this.storage.isEquipementDisponible(equipement.id)) ||
+          (availability === 'unavailable' && !this.storage.isEquipementDisponible(equipement.id))) &&
         equipement.nom.toLocaleLowerCase().includes(searchTerm),
     );
   });

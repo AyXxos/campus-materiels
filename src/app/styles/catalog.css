@@ -260,6 +260,15 @@ h1 {
   background: #2e7d32;
 }
 
+.status.unavailable {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.status.unavailable .status-dot {
+  background: var(--mat-sys-error);
+}
+
 .equipment-card mat-card-actions {
   padding: 0.75rem 1rem 1rem;
 }
